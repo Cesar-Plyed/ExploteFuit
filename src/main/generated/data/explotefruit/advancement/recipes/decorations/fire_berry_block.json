@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_fire_berry": {
+      "conditions": {
+        "items": [
+          {
+            "items": "explotefruit:fire_berry"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "explotefruit:fire_berry_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_fire_berry"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "explotefruit:fire_berry_block"
+    ]
+  }
+}

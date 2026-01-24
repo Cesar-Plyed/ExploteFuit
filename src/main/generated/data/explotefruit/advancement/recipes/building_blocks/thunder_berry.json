@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "explotefruit:thunder_berry"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_thunder_berry_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "explotefruit:thunder_berry_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_thunder_berry_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "explotefruit:thunder_berry"
+    ]
+  }
+}

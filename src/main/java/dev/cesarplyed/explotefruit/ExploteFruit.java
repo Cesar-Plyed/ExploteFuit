@@ -15,9 +15,14 @@ public class ExploteFruit implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+		// Este código se ejecuta cuando Minecraft está listo para cargar mods.
+
+		// Inicializamos (registramos) nuestros items llamando al método estático que
+		// creamos.
+		dev.cesarplyed.explotefruit.item.ModItems.registerModItems();
+
+		// Inicializamos (registramos) nuestros bloques.
+		dev.cesarplyed.explotefruit.block.ModBlocks.registerModBlocks();
 
 		LOGGER.info("Hello Fabric world!");
 	}

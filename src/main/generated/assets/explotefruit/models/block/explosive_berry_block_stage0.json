@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "explotefruit:block/explosive_berry_block_stage0"
+  }
+}

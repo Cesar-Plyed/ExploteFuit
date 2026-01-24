@@ -1,0 +1,9 @@
+{
+  "block.explotefruit.explosive_berry_block": "Explosive Berry Block",
+  "block.explotefruit.fire_berry_block": "Fire Berry Block",
+  "block.explotefruit.thunder_berry_block": "Thunder Berry Block",
+  "item.explotefruit.explosive_berry": "Explosive Berry",
+  "item.explotefruit.fire_berry": "Fire Berry",
+  "item.explotefruit.thunder_berry": "Thunder Berry",
+  "itemGroup.explotefruit": "Explosive Fruits"
+}
