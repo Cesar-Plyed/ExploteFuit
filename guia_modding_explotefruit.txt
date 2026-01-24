@@ -1,0 +1,130 @@
+================================================================================
+          GUIA DE MODDING PARA FABRIC (MINECRAFT 1.21.x) - EXPLOTEFRUIT
+================================================================================
+
+¡Hola! Aquí tienes una guía paso a paso basada en este proyecto para que 
+entiendas cómo funcionan los pilares básicos de tu mod.
+
+--------------------------------------------------------------------------------
+1. COMO CREAR UN ITEM (OBJETO)
+--------------------------------------------------------------------------------
+En las versiones nuevas (1.21.2+), los ítems necesitan conocer su propia 
+identidad (ID) en el momento de ser creados.
+
+Pasos clave:
+a) Definir una RegistryKey: Es como el "DNI" del objeto.
+b) Crear el ítem pasando esa llave en los Settings.
+c) Registrarlo en el juego.
+
+Ejemplo (ModItems.java):
+-----------------------
+private static Item registerItem(String name, Function<Item.Settings, Item> factory, Item.Settings settings) {
+    // 1. Creamos la llave (ID)
+    RegistryKey<Item> key = RegistryKey.of(RegistryKeys.ITEM, Identifier.of("explotefruit", name));
+    
+    // 2. IMPORTANTE: Le damos la llave a los settings antes de crear el objeto
+    settings.registryKey(key);
+    
+    // 3. Creamos el objeto usando la función que pasamos (factory)
+    Item item = factory.apply(settings);
+    
+    // 4. Lo registramos oficialmente
+    return Registry.register(Registries.ITEM, key, item);
+}
+
+// Uso para una baya:
+public static final Item EXPLOSIVE_BERRY = registerItem("explosive_berry", ExplosiveFruitItem::new,
+        new Item.Settings().food(EXPLOSIVE_FOOD_COMPONENT));
+
+
+--------------------------------------------------------------------------------
+2. COMO CREAR UN BLOQUE BASICO (EJ: PIEDRA)
+--------------------------------------------------------------------------------
+Un bloque básico no necesita lógica extra, solo heredar de la clase 'Block'.
+
+Ejemplo (RandomBerryBushBlock.java):
+----------------------------------
+public class RandomBerryBushBlock extends Block {
+    // El CODEC permite que Minecraft guarde y cargue el bloque correctamente
+    public static final MapCodec<RandomBerryBushBlock> CODEC = createCodec(RandomBerryBushBlock::new);
+
+    @Override
+    public MapCodec<? extends RandomBerryBushBlock> getCodec() { return CODEC; }
+
+    public RandomBerryBushBlock(Settings settings) {
+        super(settings);
+    }
+}
+
+Para que sea sólido como la piedra, lo registras así:
+ModBlocks.registerBlock("mi_bloque", (s, i) -> new RandomBerryBushBlock(s), 
+    AbstractBlock.Settings.copy(Blocks.STONE), null);
+
+
+--------------------------------------------------------------------------------
+3. COMO CREAR UN ARBUSTO (CON CRECIMIENTO)
+--------------------------------------------------------------------------------
+Los arbustos son especiales: no son sólidos, se rompen si quitas el suelo y 
+tienen "edades" (AGE).
+
+Conceptos importantes:
+- Herencia: Debe heredar de 'PlantBlock' (para que se comporte como planta).
+- Intefaz 'Fertilizable': Permite que use Polvo de Hueso (Bone Meal).
+- Propiedad AGE: Define las etapas de 0 a 3.
+
+Ejemplo de lógica (BerryBlock.java):
+------------------------------------
+// 1. Definir la propiedad de edad
+public static final IntProperty AGE = Properties.AGE_3;
+
+// 2. Darle forma al Hitbox (que no sea un cubo completo si es pequeño)
+protected static final VoxelShape SMALL_SHAPE = Block.createCuboidShape(3.0, 0.0, 3.0, 13.0, 8.0, 13.0);
+
+// 3. Lógica de cosecha (clic derecho)
+@Override
+protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    int age = state.get(AGE);
+    if (age > 1) { // Si está maduro (etapa 2 o 3)
+        // Soltar el ítem
+        Block.dropStack(world, pos, new ItemStack(this.fruitItem, 2));
+        // Resetear el arbusto a la etapa 1
+        world.setBlockState(pos, state.with(AGE, 1), 2);
+        return ActionResult.SUCCESS;
+    }
+    return super.onUse(state, world, pos, player, hit);
+}
+
+
+--------------------------------------------------------------------------------
+4. CONFIGURAR DATAGEN (GENERACION AUTOMATICA)
+--------------------------------------------------------------------------------
+¡No crees los JSON a mano! Usa DataGen para que Java los haga por ti.
+
+En ModModelProvider.java:
+------------------------
+@Override
+public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
+    // A) PARA BLOQUES CUBICOS: Una sola textura en todas las caras.
+    blockStateModelGenerator.registerSimpleCubeAll(ModBlocks.RANDOM_BERRY_BUSH);
+
+    // B) PARA ARBUSTOS/CULTIVOS: Mapea automáticamente edad -> texto.
+    // Busca texturas llamadas: nombre_bloque_stage0, _stage1, etc.
+    blockStateModelGenerator.registerCrop(ModBlocks.EXPLOSIVE_BERRY_BLOCK, BerryBlock.AGE, 0, 1, 2, 3);
+}
+
+@Override
+public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+    // Crea el modelo 2D estándar para el ítem de la mano
+    itemModelGenerator.register(ModItems.EXPLOSIVE_BERRY, Models.GENERATED);
+}
+
+--------------------------------------------------------------------------------
+CONSEJO FINAL (AESTHETICS):
+Para que las texturas transparentes (como arbustos) no se vean con fondo negro, 
+debes registrar el bloque en el Cliente indicando que usa la capa 'CUTOUT'.
+
+ExploteFruitClient.java:
+BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TU_BLOQUE, RenderLayer.getCutout());
+--------------------------------------------------------------------------------
+
+¡Espero que esta guía te sirva para dominar el modding! ¡A darle duro! 🚀
