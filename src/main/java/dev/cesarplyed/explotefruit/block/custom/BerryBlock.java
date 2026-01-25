@@ -1,6 +1,10 @@
 package dev.cesarplyed.explotefruit.block.custom;
 
+import org.jspecify.annotations.NonNull;
+
 import com.mojang.serialization.MapCodec;
+
+import dev.cesarplyed.explotefruit.item.ModItems;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCollisionHandler;
@@ -30,8 +34,8 @@ import net.minecraft.world.event.GameEvent;
  * Bloque de arbusto de bayas personalizado con etapas de crecimiento.
  */
 public class BerryBlock extends PlantBlock implements Fertilizable {
-    public static final MapCodec<BerryBlock> CODEC = createCodec(
-            settings -> new BerryBlock(settings, net.minecraft.item.Items.AIR));
+    public static final MapCodec<@NonNull BerryBlock> CODEC = createCodec(
+        settings -> new BerryBlock(settings, ModItems.EXPLOSIVE_BERRY));
     public static final IntProperty AGE = Properties.AGE_3;
 
     private static final VoxelShape SMALL_SHAPE = Block.createCuboidShape(3.0, 0.0, 3.0, 13.0, 8.0, 13.0);
@@ -45,6 +49,8 @@ public class BerryBlock extends PlantBlock implements Fertilizable {
         this.setDefaultState(this.stateManager.getDefaultState().with(AGE, 0));
     }
 
+
+
     @Override
     protected MapCodec<? extends PlantBlock> getCodec() {
         return CODEC;
@@ -52,7 +58,9 @@ public class BerryBlock extends PlantBlock implements Fertilizable {
 
     @Override
     protected ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state, boolean includeData) {
-        return new ItemStack(this.fruitItem);
+        // Devolver el BlockItem del arbusto, no la baya
+        // Esto previene que suelte bayas al ser colocado
+        return new ItemStack(this.asItem());
     }
 
     @Override
@@ -110,7 +118,14 @@ public class BerryBlock extends PlantBlock implements Fertilizable {
             if (age == 3)
                 count++;
 
-            Block.dropStack(world, pos, new ItemStack(this.fruitItem, count));
+            // Verificar que fruitItem no sea null antes de usarlo
+            if (this.fruitItem != null) {
+                Block.dropStack(world, pos, new ItemStack(this.fruitItem, count));
+            } else {
+                // Si fruitItem es null, usar una baya por defecto
+                Block.dropStack(world, pos, new ItemStack(dev.cesarplyed.explotefruit.item.ModItems.EXPLOSIVE_BERRY, count));
+            }
+            
             world.playSound(null, pos, SoundEvents.BLOCK_SWEET_BERRY_BUSH_PICK_BERRIES, SoundCategory.BLOCKS, 1.0F,
                     0.8F + world.random.nextFloat() * 0.4F);
 

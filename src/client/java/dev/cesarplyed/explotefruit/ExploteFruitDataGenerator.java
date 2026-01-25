@@ -10,10 +10,10 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
  */
 public class ExploteFruitDataGenerator implements DataGeneratorEntrypoint {
     @Override
-    public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
+    public void onInitializeDataGenerator(@SuppressWarnings("null") FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
-        // Añadimos el proveedor de modelos.
+        // Modelos manuales en resources/ - deshabilitado datagen para modelos
         pack.addProvider(ModModelProvider::new);
 
         // Añadimos el proveedor de traducciones (Idioma).

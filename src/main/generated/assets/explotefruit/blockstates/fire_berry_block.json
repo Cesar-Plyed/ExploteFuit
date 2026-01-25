@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
-      "model": "explotefruit:block/fire_berry_block"
+    "age=0": {
+      "model": "explotefruit:block/fire_berry_block_stage0"
+    },
+    "age=1": {
+      "model": "explotefruit:block/fire_berry_block_stage1"
+    },
+    "age=2": {
+      "model": "explotefruit:block/fire_berry_block_stage2"
+    },
+    "age=3": {
+      "model": "explotefruit:block/fire_berry_block_stage3"
     }
   }
 }

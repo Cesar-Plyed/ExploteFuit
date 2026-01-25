@@ -112,19 +112,61 @@ public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGen
     blockStateModelGenerator.registerCrop(ModBlocks.EXPLOSIVE_BERRY_BLOCK, BerryBlock.AGE, 0, 1, 2, 3);
 }
 
-@Override
-public void generateItemModels(ItemModelGenerator itemModelGenerator) {
+@Overridee
+public void genrateItemModels(ItemModelGenerator itemModelGenerator) {
     // Crea el modelo 2D estándar para el ítem de la mano
     itemModelGenerator.register(ModItems.EXPLOSIVE_BERRY, Models.GENERATED);
 }
 
 --------------------------------------------------------------------------------
+5. COMO CREAR UNA BALLESTA Y PROYECTILES PERSONALIZADOS
+--------------------------------------------------------------------------------
+Para una ballesta con munición especial (como bayas), necesitas 4 cosas:
+
+a) La Entidad (BerryProjectileEntity):
+   - Extiende 'PersistentProjectileEntity' (como las flechas).
+   - Debe implementar 'FlyingItemEntity' para usar el render de ítem.
+   - Lógica: En 'onCollision', creas la explosión usando 'world.createExplosion'.
+   - Bonus: Calculamos la distancia desde el origen para aumentar la fuerza.
+
+b) El Item de la Ballesta (BerryCrossbowItem):
+   - Extiende 'CrossbowItem'.
+   - Sobreescribe 'getProjectiles' para aceptar tus bayas.
+   - Sobreescribe 'shootAll' para reducir la velocidad (speed * 0.85f).
+
+c) El Registro (ModEntities):
+   - Registra tu entidad en 'ENTITY_TYPE'.
+   - Úsala en el constructor de tu proyectil.
+
+d) El Render (ExploteFruitClient):
+   - Debes registrar un 'EntityRenderer' para que el proyectil se vea.
+   - 'FlyingItemEntityRenderer' es el más fácil: hace que se vea como el ítem volando.
+
+--------------------------------------------------------------------------------
+CONSEJO EXTRA (CONFIGURACION):
+Hemos añadido un comando para cambiar la explosión:
+/explotefruit set_multiplier <valor>
+Internamente, esto cambia una variable estática en 'BerryProjectileEntity'.
+--------------------------------------------------------------------------------
 CONSEJO FINAL (AESTHETICS):
-Para que las texturas transparentes (como arbustos) no se vean con fondo negro, 
-debes registrar el bloque en el Cliente indicando que usa la capa 'CUTOUT'.
+Para que las texturas transparentes no se vean con fondo negro, debes indicar qué "pincel" usar.
+Existen 4 tipos principales de Render Layers en Minecraft:
+
+1. SOLID (Sólido): Para bloques opacos (Piedra, Tierra). Es el más rápido.
+2. CUTOUT (Recorte): Para píxeles que son o 100% visibles o 100% invisibles. 
+   Uso: Arbustos de bayas, flores, cristal normal.
+3. CUTOUT_MIPPED (Recorte Suave): Igual que Cutout pero se ve mejor de lejos.
+   Uso: Hojas de árboles, barras de hierro.
+4. TRANSLUCENT (Translúcido): Permite niveles de transparencia (como el humo).
+   Uso: Agua, Hielo, Cristal tintado. Es el más pesado para el PC.
+
+En versiones nuevas (1.21.6+), se usa 'BlockRenderLayer' en el Cliente:
 
 ExploteFruitClient.java:
-BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TU_BLOQUE, RenderLayer.getCutout());
+-----------------------
+import net.minecraft.client.render.BlockRenderLayer;
+...
+BlockRenderLayerMap.putBlock(ModBlocks.TU_BLOQUE, BlockRenderLayer.CUTOUT);
 --------------------------------------------------------------------------------
 
 ¡Espero que esta guía te sirva para dominar el modding! ¡A darle duro! 🚀

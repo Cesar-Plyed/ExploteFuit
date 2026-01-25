@@ -1,6 +1,8 @@
 package dev.cesarplyed.explotefruit.block;
 
-import dev.cesarplyed.explotefruit.block.custom.BerryBlock;
+import dev.cesarplyed.explotefruit.block.custom.ExplosiveBerryBlock;
+import dev.cesarplyed.explotefruit.block.custom.FireBerryBlock;
+import dev.cesarplyed.explotefruit.block.custom.ThunderBerryBlock;
 import dev.cesarplyed.explotefruit.block.custom.RandomBerryBushBlock;
 import dev.cesarplyed.explotefruit.item.ModItems;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
@@ -26,30 +28,32 @@ public class ModBlocks {
 
         // Arbustos de Bayas con lógica de crecimiento
         public static final Block EXPLOSIVE_BERRY_BLOCK = registerBlock("explosive_berry_block",
-                        (settings, item) -> new BerryBlock(settings, item),
+                        (settings, item) -> new ExplosiveBerryBlock(settings),
                         AbstractBlock.Settings.copy(Blocks.SWEET_BERRY_BUSH).ticksRandomly().noCollision().nonOpaque(),
-                        ModItems.EXPLOSIVE_BERRY);
+                        ModItems.EXPLOSIVE_BERRY, true);
 
         public static final Block FIRE_BERRY_BLOCK = registerBlock("fire_berry_block",
-                        (settings, item) -> new BerryBlock(settings, item),
+                        (settings, item) -> new FireBerryBlock(settings),
                         AbstractBlock.Settings.copy(Blocks.SWEET_BERRY_BUSH).ticksRandomly().noCollision().nonOpaque(),
-                        ModItems.FIRE_BERRY);
+                        ModItems.FIRE_BERRY, true);
 
         public static final Block THUNDER_BERRY_BLOCK = registerBlock("thunder_berry_block",
-                        (settings, item) -> new BerryBlock(settings, item),
+                        (settings, item) -> new ThunderBerryBlock(settings),
                         AbstractBlock.Settings.copy(Blocks.SWEET_BERRY_BUSH).ticksRandomly().noCollision().nonOpaque(),
-                        ModItems.THUNDER_BERRY);
+                        ModItems.THUNDER_BERRY, true);
 
-        // Bloque básico de aprendizaje (Piedra)
+        // Arbusto de bayas aleatorias (usa configuración de arbusto de bayas)
         public static final Block RANDOM_BERRY_BUSH = registerBlock("random_berry_bush",
                         (settings, item) -> new RandomBerryBushBlock(settings),
-                        AbstractBlock.Settings.copy(Blocks.STONE).strength(1.5f), null);
+                        AbstractBlock.Settings.copy(Blocks.SWEET_BERRY_BUSH).ticksRandomly().noCollision().nonOpaque(),
+                        ModItems.RANDOM_BERRY, true);
 
         /**
-         * Registra un bloque y crea automáticamente su BlockItem.
+         * Registra un bloque y crea automáticamente su BlockItem si registerItem es
+         * true.
          */
         private static Block registerBlock(String name, BiFunction<AbstractBlock.Settings, Item, Block> factory,
-                        AbstractBlock.Settings settings, Item fruitItem) {
+                        AbstractBlock.Settings settings, Item fruitItem, boolean registerItem) {
                 Identifier id = Identifier.of("explotefruit", name);
                 RegistryKey<Block> blockKey = RegistryKey.of(RegistryKeys.BLOCK, id);
                 RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, id);
@@ -57,10 +61,13 @@ public class ModBlocks {
                 settings.registryKey(blockKey);
                 Block block = factory.apply(settings, fruitItem);
 
-                registerBlockItem(itemKey, block);
+                if (registerItem) {
+                        registerBlockItem(itemKey, block);
+                }
                 return Registry.register(Registries.BLOCK, blockKey, block);
         }
 
+        @SuppressWarnings("null")
         private static Item registerBlockItem(RegistryKey<Item> key, Block block) {
                 Item.Settings settings = new Item.Settings().registryKey(key);
                 return Registry.register(Registries.ITEM, key, new BlockItem(block, settings));
@@ -73,6 +80,7 @@ public class ModBlocks {
                 entries.add(RANDOM_BERRY_BUSH);
         }
 
+        @SuppressWarnings("null")
         public static void registerModBlocks() {
                 System.out.println("Registrando Mod Blocks para explotefruit");
                 ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS)
