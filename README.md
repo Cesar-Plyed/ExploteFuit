@@ -47,3 +47,20 @@
 ## ⚙️ Configuration
 
 Configuration files can be found in:
+config/explotefuit.json
+Available options:
+- `explosionPower`: Adjust explosion strength (default: 2.0)
+- `damagePlayer`: Whether explosions damage the player (default: true)
+- `destroyBlocks`: Block destruction toggle (default: false for griefing protection)
+
+## 🛠️ Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/Cesar-Plyed/ExploteFuit.git
+cd ExploteFuit
+
+# Build the mod
+./gradlew build
+
+# Output will be in build/libs/
